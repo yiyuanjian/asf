@@ -8,7 +8,6 @@ class Asf_WebApp {
         require 'Asf/Autoloader.php';
         Asf_Autoloader::regist();
 
-        //TODO:process config
         $conf && Asf_Conf::init($conf);
 
 

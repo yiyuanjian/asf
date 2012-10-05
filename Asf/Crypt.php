@@ -7,7 +7,6 @@
 class Asf_Crypt {
     public static $instancePoll = array();
 
-    // TODO - Insert your code here
     public static function getInstance($name) {
         if (!$name) {
             throw new Asf_Crypt_Exception("can't getInstance without name");

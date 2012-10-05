@@ -50,7 +50,6 @@ class Asf_Log_Scribe extends Asf_Log_Abstract implements Asf_Log_Interface {
             $this->connect();
         }
 
-        //FIXME
         $header = pack('N', $this->buf_len);
         fwrite($this->handle, $header.$this->buf, $this->buf_len + 4);
 
@@ -153,7 +152,6 @@ class Asf_Log_Scribe extends Asf_Log_Abstract implements Asf_Log_Interface {
         //: filed end current 0
         $this->writeByte(self::TYPE_STOP); //filed stop
         //: struct end. current 0
-        //FIXME
         $this->flushBuf();
     }
 

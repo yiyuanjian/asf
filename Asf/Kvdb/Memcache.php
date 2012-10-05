@@ -5,7 +5,6 @@
  *
  */
 class Asf_Kvdb_Memcache {
-    // TODO - Insert your code here
     public function get($key) {
 
     }

@@ -5,7 +5,6 @@
  *
  */
 class Asf_Format {
-    // TODO - Insert your code here
 
     public static function str2Standard($str, $firstUp = false) {
         if(empty($str) || !preg_match('/^[A-Za-z\-]+$/', $str)) {

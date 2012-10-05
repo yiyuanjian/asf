@@ -5,7 +5,6 @@
  * 
  */
 class Asf_Log_Exception extends Exception {
-    // TODO - Insert your code here
     const NOT_SUPPORT_HANDLER = 1;
     const PARSE_CONF_FAILED = 2;
     

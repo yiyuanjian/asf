@@ -6,7 +6,6 @@
  *
  */
 abstract class Asf_Kvdb_Abstract {
-    // TODO - Insert your code here
     protected $host;
     protected $port;
     protected $timeout = 5;
