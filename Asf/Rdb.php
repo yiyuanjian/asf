@@ -3,6 +3,10 @@
 final class Asf_Rdb {
     private static $connPoll;
 
+    const ASSOC = 1;
+    const NUM = 2;
+    const BOTH = 3;
+
     public static function getInstance($connStr) {
         if (!$connStr) {
             throw new Asf_Rdb_Exception("can't getInstance without config");

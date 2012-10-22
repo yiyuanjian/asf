@@ -1,8 +1,6 @@
 <?php
-
-class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
-    const DEFAULT_PORT = 3306;
-
+class Asf_Rdb_Pgsql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
+    const DEFAULT_PORT = 5432;
 
     public function __construct($confs = array()) {
         if($confs) {
@@ -19,19 +17,13 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
 
     public function connect() {
         if(empty($this->conn)) {
-            $conn = mysql_connect($this->host.':'.$this->port,
-                        $this->user, $this->password);
+            $connStr = "host=$this->host port=$this->port dbname=$this->dbname user=$this->user password=$this->password";
+            $conn = pg_connect($connStr);
+
             if(!$conn) {
-                throw new Asf_Rdb_Exception("conn to host failed\n",
-                            Asf_Rdb_Exception::ERR_CONNECT_FAILED);
+                throw new Asf_Rdb_Exception("Connect to Pgsql failed", 0x01);
                 return null;
             }
-            if($this->dbname) {
-                if(!mysql_select_db($this->dbname, $conn)) {
-                    throw new Exception("select db $this->dbname failed");
-                }
-            }
-            $this->charset && mysql_set_charset($this->charset, $conn);
 
             $this->conn = $conn;
         }
@@ -40,23 +32,25 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
     }
 
     public function close() {
-        return $this->conn && mysql_close($this->conn);
+        return $this->conn && pg_close($this->conn);
     }
 
     public function prepare() {
 
     }
 
-    public function query($sql) {
+    public function query($sql = "") {
         if(!$this->conn) {
             $this->connect();
         }
 
-        $res = mysql_query($sql, $this->conn);
+        $sql = $this->checkSQL($sql);
+
+        $res = pg_query($this->conn, $sql);
 
         if($res === false) {
-            throw new Asf_Rdb_Exception("Query $sql failed: ".mysql_errno($this->conn).": ".mysql_error($this->conn),
-                        Asf_Rdb_Exception::ERR_QUERY_FAILED);
+            throw new Asf_Rdb_Exception("Query $sql failed: ".pg_last_error($this->conn),
+                    Asf_Rdb_Exception::ERR_QUERY_FAILED);
             return false;
         }
 
@@ -64,35 +58,48 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
         return $this->res;
     }
 
-    public function fetchSingleValue($sql) {
+    public function checkSQL($sql) {
+        if(!$sql && !$this->sql) {
+            throw new Exception("SQL is empty!", 0x21);
+            return null;
+        }
+
+        if(!$sql) {
+            return $this->sql;
+        }
+
+        return $sql;
+    }
+
+    public function fetchSingleValue($sql = '') {
         $res = $this->query($sql);
 
-        $row = mysql_fetch_row($res);
+        $row = pg_fetch_row($res);
 
         return $row ? $row[0] : null;
     }
 
-    public function fetchOneRow($sql, $mode = MYSQL_ASSOC) {
+    public function fetchOneRow($sql = '', $mode = PGSQL_ASSOC) {
         $res = $this->query($sql);
 
-        $row = mysql_fetch_array($res, $mode);
+        $row = pg_fetch_array($res, null, $mode);
 
         return $row;
     }
 
-    public function fetchAll($sql, $maxRows = 1000, $mode = MYSQL_ASSOC) {
+    public function fetchAll($sql = '', $maxRows = 1000, $mode = PGSQL_ASSOC) {
         $res = $this->query($sql);
 
         $results = array();
         if($maxRows) {
             $count = 0;
-            while(($row = mysql_fetch_array($res, $mode)) !== false) {
+            while(($row = pg_fetch_array($res, null, $mode)) !== false) {
                 $results[] = $row;
                 $count ++;
                 if($count == $maxRows) break;
             }
         } else {
-            while(($row = mysql_fetch_array($res, $mode)) !== false) {
+            while(($row = pg_fetch_array($res, $mode)) !== false) {
                 $results[] = $row;
             }
         }
@@ -100,13 +107,13 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
         return $results;
     }
 
-    public function fetchOneByOne($res, $mode = MYSQL_ASSOC) {
+    public function fetchOneByOne($res, $mode = PGSQL_ASSOC) {
         if(!is_resource($res)) {
             throw new Asf_Rdb_Exception("argument 1 is not available resource");
             return null;
         }
 
-        return mysql_fetch_array($res, $mode);
+        return pg_fetch_array($res, null, $mode);
     }
 
     public function commit() {
@@ -116,4 +123,6 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
     public function rollback() {
 
     }
+
+
 }

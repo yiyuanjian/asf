@@ -25,6 +25,8 @@ class Asf_CliApp {
 
         //argc can not accessable here. user $_SERVER['argc']
         $argumentArray = array();
+        $ctl = "";
+        $act = "";
         if($_SERVER['argc'] > 1) {
             $args = &$_SERVER['argv'];
             for ($i = 1; $i < $_SERVER['argc']; $i++) {

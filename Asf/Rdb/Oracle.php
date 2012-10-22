@@ -32,15 +32,16 @@ class Asf_Rdb_Oracle extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
     }
 
     public function connect() {
+        if(empty($this->conn)) {
+            $connStr = "(description=(address=(protocol=tcp)(host=".$this->host.")".
+                    "(port=".$this->port."))(connect_data=(service_name=".$this->dbname.")))";
 
-        $connStr = "(description=(address=(protocol=tcp)(host=".$this->host.")".
-                "(port=".$this->port."))(connect_data=(service_name=".$this->dbname.")))";
+            $this->connectId = oci_connect($this->user, $this->password, $connStr, $this->charset);
 
-        $this->connectId = oci_connect($this->user, $this->password, $connStr, $this->charset);
-
-        if(!$this->connectId) {
-            throw new Asf_Rdb_Exception("connect to oracle $connStr failed", 0x0201);
-            return null;
+            if(!$this->connectId) {
+                throw new Asf_Rdb_Exception("connect to oracle $connStr failed", 0x0201);
+                return null;
+            }
         }
 
         return $this->connectId;
