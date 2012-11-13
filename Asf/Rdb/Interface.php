@@ -7,13 +7,13 @@ interface Asf_Rdb_Interface {
 
     public function prepare();
 
-    public function query($sql);
+    public function query($sql = '');
 
-    public function fetchSingleValue($sql);
+    public function fetchSingleValue($sql = '');
 
-    public function fetchOneRow($sql, $mode = 1);
+    public function fetchOneRow($sql = '', $mode = 1);
 
-    public function fetchAll($sql, $maxRows = 1000, $mode = 1);
+    public function fetchAll($sql = '', $maxRows = 1000, $mode = 1);
 
     public function fetchOneByOne($res);
 
@@ -36,4 +36,6 @@ interface Asf_Rdb_Interface {
     public function update($table, $fileds, $condition = '');
 
     public function insert($table, $fileds = array());
+
+    public function escape(&$fileds);
 }

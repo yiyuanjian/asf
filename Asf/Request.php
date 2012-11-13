@@ -65,7 +65,7 @@ class Asf_Request {
 
     private static function processString($string, $maxlen, $slash, $charset = 'utf-8') {
         if(!get_magic_quotes_gpc() && $slash) {
-            $slash = addslashes($string);
+            $string = addslashes($string);
         }
 
         if($maxlen) {

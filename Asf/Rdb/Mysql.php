@@ -47,10 +47,12 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
 
     }
 
-    public function query($sql) {
+    public function query($sql = '') {
         if(!$this->conn) {
             $this->connect();
         }
+
+        $sql = $this->getSQL($sql);
 
         $res = mysql_query($sql, $this->conn);
 
@@ -64,7 +66,7 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
         return $this->res;
     }
 
-    public function fetchSingleValue($sql) {
+    public function fetchSingleValue($sql = '') {
         $res = $this->query($sql);
 
         $row = mysql_fetch_row($res);
@@ -72,7 +74,7 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
         return $row ? $row[0] : null;
     }
 
-    public function fetchOneRow($sql, $mode = MYSQL_ASSOC) {
+    public function fetchOneRow($sql = '', $mode = MYSQL_ASSOC) {
         $res = $this->query($sql);
 
         $row = mysql_fetch_array($res, $mode);
@@ -80,7 +82,7 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
         return $row;
     }
 
-    public function fetchAll($sql, $maxRows = 1000, $mode = MYSQL_ASSOC) {
+    public function fetchAll($sql = '', $maxRows = 1000, $mode = MYSQL_ASSOC) {
         $res = $this->query($sql);
 
         $results = array();
@@ -116,4 +118,39 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
     public function rollback() {
 
     }
+
+    public function escape(&$fileds) {
+
+    }
+
+    public function insert($table, $fileds = array()) {
+        $keys = array();
+        $values = array();
+
+        foreach ($fileds as $key => $value) {
+            $keys[] = $key;
+            $values[] = "'$value'";
+        }
+
+        $sql = "INSERT INTO $table(`".implode("`,`", $keys)."`) VALUES(".
+                implode(",",$values).")";
+
+        return $this->query($sql);
+    }
+
+    public function update($table, $fileds, $condition = '') {
+        $sql = "UPDATE $table set ";
+        $updateFileds = array();
+        foreach ($fileds as $k => $v) {
+            $updateFileds[] = "`$k`='$v'";
+        }
+        $sql .= implode(",", $updateFileds);
+        unset($updateFileds);
+        if($condition) {
+            $sql .= "WHERE $condition";
+        }
+
+        return $this->query($sql);
+    }
+
 }

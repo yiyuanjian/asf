@@ -44,7 +44,7 @@ class Asf_Rdb_Pgsql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
             $this->connect();
         }
 
-        $sql = $this->checkSQL($sql);
+        $sql = $this->getSQL($sql);
 
         $res = pg_query($this->conn, $sql);
 
@@ -56,19 +56,6 @@ class Asf_Rdb_Pgsql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
 
         $this->res = $res;
         return $this->res;
-    }
-
-    public function checkSQL($sql) {
-        if(!$sql && !$this->sql) {
-            throw new Exception("SQL is empty!", 0x21);
-            return null;
-        }
-
-        if(!$sql) {
-            return $this->sql;
-        }
-
-        return $sql;
     }
 
     public function fetchSingleValue($sql = '') {
@@ -124,5 +111,24 @@ class Asf_Rdb_Pgsql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
 
     }
 
+    public function escape(&$fileds) {
+        if(empty($fileds)) {
+            return $fields;
+        }
 
+        if(is_string($fileds)) {
+            return pg_escape_string($fileds);
+        }
+
+        if (is_array($fileds)) {
+            foreach ($fileds as $k => &$v) {
+                if(is_string($v)) $v = pg_escape_string($v);
+            }
+
+            return $fileds;
+        }
+
+        //do nothing, just return
+        return $fileds;
+    }
 }

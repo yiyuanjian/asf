@@ -91,9 +91,22 @@ abstract class Asf_Rdb_Abstract {
             $values[] = "'$value'";
         }
 
-        $sql = "INSERT INTO $table(".implode(",", $keys).") VALUES(".
+        $sql = "INSERT INTO $table(".implode(", ", $keys).") VALUES(".
                 implode(",",$values).")";
 
         return $this->query($sql);
+    }
+
+    protected function getSQL($sql) {
+        if(!$sql && !$this->sql) {
+            throw new Asf_Rdb_Exception("SQL is empty!", 0x21);
+            return null;
+        }
+
+        if(!$sql) {
+            return $this->sql;
+        }
+
+        return $sql;
     }
 }

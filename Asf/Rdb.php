@@ -57,7 +57,7 @@ final class Asf_Rdb {
 
         $match = null;
 
-        if (preg_match('/([A-Za-z]+):\\/\\/([A-Za-z0-9_]*):([\x21-\x7e]*)@([a-z0-9.]+)(:[0-9]{3,5})?\\/([A-Za-z0-9\-_]+)(:[a-z0-9A-Z]{3,10})?/',$str, $match)) {
+        if (preg_match('/([A-Za-z]+):\\/\\/([A-Za-z0-9_]*):([\x21-\x7e]*)@([a-z0-9.]+)(:[0-9]{3,5})?\\/([A-Za-z0-9\-_]+)(:[a-z0-9A-Z\-]{3,10})?/',$str, $match)) {
             $config['user'] = $match[2];
             $config['password'] = $match[3];
             $config['host'] = $match[4];

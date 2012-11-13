@@ -8,13 +8,6 @@ class Asf_Rdb_Oracle extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
     const DEFAULT_PORT = 1521;
     const DEFAULT_CHARSET = "al32utf8";
 
-    private $host = null;
-    private $port = 1521;
-    private $user = null;
-    private $password = null;
-    private $dbname = "";
-    private $charset = "";
-
     private $connectId = null;
     private $queryId = null;
 
@@ -55,10 +48,12 @@ class Asf_Rdb_Oracle extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
 
     }
 
-    public function query($sql) {
+    public function query($sql = '') {
         if(!$this->connectId) {
             $this->connect();
         }
+
+        $sql = $this->getSQL($sql);
 
         $this->queryId = oci_parse($this->connectId, $sql);
         if(!$this->queryId) {
@@ -76,7 +71,7 @@ class Asf_Rdb_Oracle extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
         return $this->queryId;
     }
 
-    public function fetchSingleValue($sql) {
+    public function fetchSingleValue($sql = '') {
         $queryId = $this->query($sql);
         if($queryId == null) return null;
 
@@ -89,14 +84,14 @@ class Asf_Rdb_Oracle extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
         return $row[0];
     }
 
-    public function fetchOneRow($sql, $mode = 1) {
+    public function fetchOneRow($sql = '', $mode = 1) {
         $res = $this->query($sql);
         if($res == null) return null;
 
         return oci_fetch_assoc($res);
     }
 
-    public function fetchAll($sql, $maxRows = 1000, $mode = 1) {
+    public function fetchAll($sql = '', $maxRows = 1000, $mode = 1) {
         $queryId = $this->query($sql);
         if($queryId == null) return null;
 
@@ -119,6 +114,10 @@ class Asf_Rdb_Oracle extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
     }
 
     public function rollback() {
+
+    }
+
+    public function escape(&$fileds) {
 
     }
 }

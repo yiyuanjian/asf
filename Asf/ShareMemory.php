@@ -8,11 +8,15 @@ class Asf_ShareMemory {
       it should be accessed by callers.*/
     const PROJ = '~';
 
+    const SHM_ROOT = "/dev/shm/asf_shm_";
+
     private $key;
     private $perm = 0600;
     private $len = 65536;
 
     private $tmpDir = "/tmp/";
+
+
 
     private $shmId;
 
@@ -64,7 +68,7 @@ class Asf_ShareMemory {
 
 
     public function open() {
-        $this->shmId = shmop_open($this->key, "c", $this->perm, $this->len);
+        $this->shmId = $this->shmopOpen($this->key, "c", $this->perm, $this->len);
         if(!$this->shmId) {
             throw new Exception("open shm with key ".$this-key." failed");
             return false;
@@ -75,7 +79,7 @@ class Asf_ShareMemory {
 
     public function close() {
         if($this->shmId > 0) {
-            shmop_close($this->shmId);
+            $this->shmopClose($this->shmId);
             $this->shmId = 0;
         }
 
@@ -85,14 +89,14 @@ class Asf_ShareMemory {
     public function delete() {
         //perhaps not need read or write, just delete it
         if(!$this->shmId) {
-            $id = shmop_open($this->key, "w", $this->perm, $this->len);
+            $id = $this->shmopOpen($this->key, "w", $this->perm, $this->len);
             if(!$id) {
                 return true;
             }
-            return shmop_delete($id);
+            return $this->shmopDelete($id);
         }
 
-        $res = shmop_delete($this->shmId);
+        $res = $this->shmopDelete($this->shmId);
         $this->shmId = 0;
         return $res;
     }
@@ -102,7 +106,7 @@ class Asf_ShareMemory {
             $this->open();
         }
 
-        $data = shmop_read($this->shmId, 0, $this->len);
+        $data = $this->shmopRead($this->shmId, 0, $this->len);
 
         return ord($data) ? unserialize($data) : array();
     }
@@ -119,7 +123,7 @@ class Asf_ShareMemory {
             $this->open();
         }
 
-        return shmop_write($this->shmId, $data, 0);
+        return $this->shmopWrite($this->shmId, $data, 0);
     }
 
     public function getByKey($key) {
@@ -188,5 +192,53 @@ class Asf_ShareMemory {
 
     public function __destruct() {
         $this->close();
+    }
+
+    private function shmopOpen($key, $tag, $perm, $len) {
+        if(function_exists('shmop_open')) {
+            return shmop_open($key, $tag, $perm, $len);
+        }
+
+        if(file_exists(self::SHM_ROOT.$key)) {
+            return fopen(self::SHM_ROOT.$key, "r+b");
+        }
+
+        return fopen(self::SHM_ROOT.$key, "w+b");
+    }
+
+    private function shmopDelete($id) {
+        if(function_exists('shmop_delete')) {
+            return shmop_delete($id);
+        }
+
+        if(file_exists(self::SHM_ROOT.$this->key)) {
+            return unlink(self::SHM_ROOT.$this->key);
+        }
+    }
+
+    private function shmopRead($id, $offset, $len) {
+        if(function_exists('shmop_read')) {
+            return shmop_read($id, $offset, $len);
+        }
+
+        fseek($id, $offset);
+        return fread($id, $len);
+    }
+
+    private function shmopWrite($id, $data, $offset) {
+        if(function_exists('shmop_write')) {
+            return shmop_write($id, $data, $offset);
+        }
+
+        fseek($id, $offset);
+        return fwrite($id, $data);
+    }
+
+    private function shmopClose($id) {
+        if(function_exists('shmop_close')) {
+            return shmop_close($id);
+        }
+
+        return fclose($id);
     }
 }
