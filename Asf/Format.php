@@ -7,7 +7,7 @@
 class Asf_Format {
 
     public static function str2Standard($str, $firstUp = false) {
-        if(empty($str) || !preg_match('/^[A-Za-z\-]+$/', $str)) {
+        if(empty($str) || !preg_match('/^[A-Za-z0-9\-]+$/', $str)) {
             return "";
         }
 
