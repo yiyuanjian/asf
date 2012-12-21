@@ -55,7 +55,7 @@ class Asf_WebApp {
             }
 
         } catch (Exception $e) {
-            echo $e->__toString();
+            trigger_error($e->__toString(), E_USER_ERROR);
         }
     }
 }
