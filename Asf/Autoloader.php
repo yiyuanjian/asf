@@ -14,7 +14,7 @@ class Asf_Autoloader {
         return true;
     }
 
-    private static function autoload($class) {
+    public static function autoload($class) {
         $path = "";
         $match = null;
         if(preg_match('/[A-Za-z_]+(Controller|Model|View|Script)$/', $class, $match)) {

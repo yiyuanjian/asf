@@ -30,7 +30,7 @@ class Asf_WebApp {
 
     public function run() {
         Asf_Request::setDataFromGet();
-        $ctl = Asf_Request::getString("__c", 20);
+        $ctl = Asf_Request::getString("__c", 40);
         $act = Asf_Request::getString("__a", 40);
         Asf_Request::setDataFromRequest();
 

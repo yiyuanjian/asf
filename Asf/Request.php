@@ -141,6 +141,20 @@ class Asf_Request {
         return false;
     }
 
+    public static function getCookieString($param, $maxlen = 0, $slash = true, $charset = "utf-8") {
+        return isset($_COOKIE[$param])
+            ? self::processString($_COOKIE[$param], $maxlen, $slash, $charset)
+            : "";
+    }
+
+    public static function getCookieInt($param) {
+        if(!isset($_COOKIE[$param])) {
+            return null;
+        }
+
+        return intval($_COOKIE[$param]);
+    }
+
     private static function processDate($date) {
         return preg_match('/^(19|20)[0-9]{2}-(0[1-9]|1[012]|[0-9])-([1-9]|0[1-9]|[12][0-9]|[3][01])$/', $date);
     }
