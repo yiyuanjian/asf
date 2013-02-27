@@ -3,6 +3,8 @@ if(!defined("APP_ROOT")) {
     exit("You must define APP_ROOT first.");
 }
 
+define("ASF_ROOT", dirname(dirname(__FILE__)));
+
 class Asf_WebApp {
     public function __construct($conf = array()) {
         require 'Asf/Autoloader.php';

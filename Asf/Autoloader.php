@@ -17,8 +17,19 @@ class Asf_Autoloader {
     public static function autoload($class) {
         $path = "";
         $match = null;
-        if(preg_match('/[A-Za-z_]+(Controller|Model|View|Script)$/', $class, $match)) {
-            $path = APP_ROOT.'/'.strtolower($match[1]).'s/';
+        if (!strncmp($class, "Asf_", 4)) {
+            $path = ASF_ROOT.'/';
+        } else {
+            $rClass = strrev($class);
+            if (strncmp($rClass, 'rellortnoC', 10) == 0) {
+                $path = APP_ROOT.'/controllers/';
+            } elseif(strncmp($rClass, 'ledoM', 5) == 0) {
+                $path = APP_ROOT.'/models/';
+            } elseif(strncmp($rClass, 'weiV', 4) == 0) {
+                $path = APP_ROOT.'/views/';
+            } elseif(strncmp($rClass, 'tpircS', 6) == 0) {
+                $path = APP_ROOT.'/scripts/';
+            }
         }
 
         $class = str_replace('_', '/', $class);
