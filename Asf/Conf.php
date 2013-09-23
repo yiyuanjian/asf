@@ -46,15 +46,30 @@ class Asf_Conf {
             }
             $host = $confArray['_host']['_default'];
             if(!isset($confArray['_host'][$host])) {
-                //FIXME: throw exception or exit directly?
                 //throw new Exception("Need use default config, but not set");
                 exit("Config Error: Need use default config, but not set. please set '_host','_default'");
             }
         }
 
+        //all configs based on host should be a array. if assigned value is not
+        // array, it should be a link.
+        if(!is_array($confArray['_host'][$host])) {
+            $hostStack = array();
+            do {
+                $host = $confArray['_host'][$host];
+                if(!isset($confArray['_host'][$host])) {
+                    exit("Can't find host $host in config file.");
+                }
+                if(in_array($host, $hostStack)) {
+                    exit("Error: $host seems into infinate loop.");
+                }
+                array_push($hostStack, $host);
+            } while(!is_array($confArray['_host'][$host]));
+        }
+
         $confArray = array_merge($confArray, $confArray['_host'][$host]);
         self::$locked = 1;
-        //FIXME: unset($confArray['_host']); ?
+        unset($confArray['_host']);
 
         //save to confs
         self::$confs = $confArray;

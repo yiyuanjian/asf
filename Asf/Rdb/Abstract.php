@@ -67,26 +67,26 @@ abstract class Asf_Rdb_Abstract {
         return $this;
     }
 
-    public function update($table, $fileds, $condition = '') {
+    public function update($table, $fields, $condition = '') {
         $sql = "UPDATE $table set ";
         $updateFileds = array();
-        foreach ($fileds as $k => $v) {
+        foreach ($fields as $k => $v) {
             $updateFileds[] = "$k='$v'";
         }
         $sql .= implode(",", $updateFileds);
         unset($updateFileds);
         if($condition) {
-            $sql .= "WHERE $condition";
+            $sql .= " WHERE $condition";
         }
 
         return $this->query($sql);
     }
 
-    public function insert($table, $fileds = array()) {
+    public function insert($table, $fields = array()) {
         $keys = array();
         $values = array();
 
-        foreach ($fileds as $key => $value) {
+        foreach ($fields as $key => $value) {
             $keys[] = $key;
             $values[] = "'$value'";
         }

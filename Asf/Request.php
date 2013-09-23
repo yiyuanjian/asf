@@ -174,7 +174,7 @@ class Asf_Request {
      */
     public static function getHost() {
         if(php_sapi_name() == "cli") {
-            return isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : "";
+            return isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : gethostname();
         }
 
         return $_SERVER['HTTP_HOST'];

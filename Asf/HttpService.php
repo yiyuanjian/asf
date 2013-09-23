@@ -24,7 +24,7 @@ class Asf_HttpService {
 
         $execCode = curl_errno($ch);
         if($execCode != 0) {
-            throw new Exception("call remote $url, POST: ".var_export($datas, true)." failed: ".curl_error($ch), $execCode);
+            throw new Asf_Exception("call remote $url, POST: ".var_export($datas, true)." failed: ".curl_error($ch), $execCode);
             return NULL;
         }
 

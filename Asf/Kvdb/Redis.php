@@ -83,5 +83,3 @@ class Asf_Kvdb_Redis extends Asf_Kvdb_Abstract implements Asf_Kvdb_Interface {
         $this->close();
     }
 }
-
-?>

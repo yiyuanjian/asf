@@ -33,9 +33,9 @@ interface Asf_Rdb_Interface {
 
     public function limit($count, $offset);
 
-    public function update($table, $fileds, $condition = '');
+    public function update($table, $fields, $condition = '');
 
-    public function insert($table, $fileds = array());
+    public function insert($table, $fields = array());
 
     public function escape(&$fileds);
 }
