@@ -57,6 +57,13 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
         $res = mysql_query($sql, $this->conn);
 
         if($res === false) {
+            if(mysql_errno($this->conn) == 2006) { //if server close the conection, just connect again and query.
+                $this->close();
+                $this->connect();
+
+                $res = mysql_query($sql, $this->conn);
+            }
+
             throw new Asf_Rdb_Exception("Query $sql failed: ".mysql_errno($this->conn).": ".mysql_error($this->conn),
                         Asf_Rdb_Exception::ERR_QUERY_FAILED);
             return false;
@@ -152,5 +159,4 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
 
         return $this->query($sql);
     }
-
 }

@@ -51,12 +51,17 @@ class Asf_Log_Scribe extends Asf_Log_Abstract implements Asf_Log_Interface {
         }
 
         $header = pack('N', $this->buf_len);
-        fwrite($this->handle, $header.$this->buf, $this->buf_len + 4);
+        $len = fwrite($this->handle, $header.$this->buf, $this->buf_len + 4);
+        if($len == false) { //connect may be broken
+            fclose($this->handle);
+            $this->connect();
+            $len = fwrite($this->handle, $header.$this->buf, $this->buf_len + 4);
+        }
 
         $this->buf = "";
         $this->buf_len = 0;
 
-        return true;
+        return $len ? true : false;
     }
 
     private function connect() {

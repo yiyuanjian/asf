@@ -24,9 +24,9 @@ if [ ! -f "$file_index" ]; then
 cat << EOF > $file_index
 <?php
 ini_set('display_errors', 'Off');
-set_include_path(".:/data/website/public/");
 
 define("APP_ROOT", realpath(dirname(__FILE__)."/../app"));
+define("APP_DEPLOY", dirname(APP_ROOT));
 
 require 'Asf/WebApp.php';
 
