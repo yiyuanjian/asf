@@ -5,7 +5,7 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
 
 
     public function __construct($confs = array()) {
-        if($confs) {
+        if ($confs) {
             $this->host = isset($confs['host']) ? $confs['host'] : null;
             $this->port = isset($confs['port']) && $confs['port'] ? $confs['port'] : self::DEFAULT_PORT;
             $this->user = isset($confs['user']) ? $confs['user'] : null;
@@ -18,16 +18,16 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
     }
 
     public function connect() {
-        if(empty($this->conn)) {
-            $conn = mysql_connect($this->host.':'.$this->port,
-                        $this->user, $this->password);
-            if(!$conn) {
+        if (empty($this->conn)) {
+            $conn = mysql_connect($this->host . ':' . $this->port,
+                $this->user, $this->password);
+            if (!$conn) {
                 throw new Asf_Rdb_Exception("conn to host failed\n",
-                            Asf_Rdb_Exception::ERR_CONNECT_FAILED);
+                    Asf_Rdb_Exception::ERR_CONNECT_FAILED);
                 return null;
             }
-            if($this->dbname) {
-                if(!mysql_select_db($this->dbname, $conn)) {
+            if ($this->dbname) {
+                if (!mysql_select_db($this->dbname, $conn)) {
                     throw new Exception("select db $this->dbname failed");
                 }
             }
@@ -40,7 +40,10 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
     }
 
     public function close() {
-        return $this->conn && mysql_close($this->conn);
+        $this->conn && mysql_close($this->conn);
+        $this->conn = null;
+
+        return true;
     }
 
     public function prepare() {
@@ -48,7 +51,7 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
     }
 
     public function query($sql = '') {
-        if(!$this->conn) {
+        if (!$this->conn) {
             $this->connect();
         }
 
@@ -56,16 +59,18 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
 
         $res = mysql_query($sql, $this->conn);
 
-        if($res === false) {
-            if(mysql_errno($this->conn) == 2006) { //if server close the conection, just connect again and query.
+        if ($res === false) {
+            if (mysql_errno($this->conn) == 2006) { //if server close the conection, just connect again and query.
                 $this->close();
                 $this->connect();
 
                 $res = mysql_query($sql, $this->conn);
             }
+        }
 
-            throw new Asf_Rdb_Exception("Query $sql failed: ".mysql_errno($this->conn).": ".mysql_error($this->conn),
-                        Asf_Rdb_Exception::ERR_QUERY_FAILED);
+        if ($res === fasle) {
+            throw new Asf_Rdb_Exception("Query $sql failed: " . mysql_errno($this->conn) . ": " . mysql_error($this->conn),
+                Asf_Rdb_Exception::ERR_QUERY_FAILED);
             return false;
         }
 
@@ -93,15 +98,16 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
         $res = $this->query($sql);
 
         $results = array();
-        if($maxRows) {
+        if ($maxRows) {
             $count = 0;
-            while(($row = mysql_fetch_array($res, $mode)) !== false) {
+            while (($row = mysql_fetch_array($res, $mode)) !== false) {
                 $results[] = $row;
-                $count ++;
-                if($count == $maxRows) break;
+                $count++;
+                if ($count == $maxRows)
+                    break;
             }
         } else {
-            while(($row = mysql_fetch_array($res, $mode)) !== false) {
+            while (($row = mysql_fetch_array($res, $mode)) !== false) {
                 $results[] = $row;
             }
         }
@@ -110,7 +116,7 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
     }
 
     public function fetchOneByOne($res, $mode = MYSQL_ASSOC) {
-        if(!is_resource($res)) {
+        if (!is_resource($res)) {
             throw new Asf_Rdb_Exception("argument 1 is not available resource");
             return null;
         }
@@ -139,8 +145,8 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
             $values[] = "'$value'";
         }
 
-        $sql = "INSERT INTO $table(`".implode("`,`", $keys)."`) VALUES(".
-                implode(",",$values).")";
+        $sql = "INSERT INTO $table(`" . implode("`,`", $keys) . "`) VALUES(" .
+            implode(",", $values) . ")";
 
         return $this->query($sql);
     }
@@ -153,7 +159,7 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
         }
         $sql .= implode(",", $updateFileds);
         unset($updateFileds);
-        if($condition) {
+        if ($condition) {
             $sql .= " WHERE $condition";
         }
 
