@@ -64,7 +64,7 @@ class Asf_WebApp {
             if(isset($_SERVER['REQUEST_URI'])) {
                 $qsPos = strpos($_SERVER['REQUEST_URI'], '?'); //query string start.
                 $uri = $qsPos ? substr($_SERVER['REQUEST_URI'], 0, $qsPos) : $_SERVER['REQUEST_URI'];
-                $suffix = substr($uri, strrpos('.', $uri) + 1);
+                $suffix = substr($uri, strrpos($uri, '.') + 1);
                 Asf_ContentType::setHeaderBySuffix($suffix);
             }
 
@@ -79,7 +79,7 @@ class Asf_WebApp {
             }
 
         } catch (Exception $e) {
-            trigger_error($e->__toString(), E_USER_ERROR);
+            trigger_error($e->getMessage(), E_USER_ERROR);
         }
     }
 }

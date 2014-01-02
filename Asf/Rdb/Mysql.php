@@ -68,7 +68,7 @@ class Asf_Rdb_Mysql extends Asf_Rdb_Abstract implements Asf_Rdb_Interface {
             }
         }
 
-        if ($res === fasle) {
+        if ($res === false) {
             throw new Asf_Rdb_Exception("Query $sql failed: " . mysql_errno($this->conn) . ": " . mysql_error($this->conn),
                 Asf_Rdb_Exception::ERR_QUERY_FAILED);
             return false;
