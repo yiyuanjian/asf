@@ -13,6 +13,13 @@ class Asf_Router {
 
     private $orders = array();
 
+    /**
+     * 
+     * @param string $ctlParam
+     * @param string $actParam
+     * @return Asf_Router
+     * @example addSimple('index','index')
+     */
     public function addSimple($ctlParam = '__c', $actParam = '__a') {
         if(empty($ctlParam) || empty($actParam)) {
             exit('Call '.__METHOD__.', parameters invalid');
@@ -26,9 +33,13 @@ class Asf_Router {
         return $this;
     }
 
-    /*
-     * /index/index => ctlname = index, actname = index
-    */
+    /**
+     * 
+     * @param string $uri
+     * @param array $map array('ctl' => ctlName, 'act' => actName)
+     * @return Asf_Router
+     * @example addMap('/index/json', array('ctl' => 'index', 'act' => 'json')
+     */
     public function addMap($uri, $map) {
         if (empty($uri) || !is_array($map) || !isset($map['ctl']) || !isset($map['act'])) {
             exit('Call '.__METHOD__.', parameters invalid');
@@ -41,18 +52,20 @@ class Asf_Router {
         return $this;
     }
 
-    public function addRewrite($uri, $map) {
-        if (empty($uri) || !is_array($map) || !isset($map['ctl']) || !isset($map['act'])) {
+    /**
+     * 
+     * @param string $uri
+     * @return Asf_Router
+     * @example addRewrite('/:ctl/:act')
+     */
+    public function addRewrite($uri) {
+        if (empty($uri)) {
             exit('Call '.__METHOD__.', parameters invalid');
         }
         $ctlPos = strpos($uri, '/:ctl');
         $actPos = strpos($uri, '/:act');
         $paramsArray = preg_split('/\/:?/', $uri);
-        $paramsKeys = array_flip($paramsArray);
-
-        foreach ($map as $k => &$v) {
-            $v = $paramsKeys[$v];
-        }
+        $map = array_flip($paramsArray);
 
         $uri = str_replace(array('/:ctl','/:act'), '/([a-zA-Z0-9_-]+)', $uri);
         $uri = str_replace('/', '\/', $uri);
@@ -61,7 +74,14 @@ class Asf_Router {
         return $this;
     }
 
-    public function addRegex ($regex, $map) {
+    /**
+     * 
+     * @param string $regex
+     * @param array $map
+     * @return Asf_Router
+     * @example $router->addRegex('/([a-z]+)\/([a-z]+)/', array("ctl" => 1,"act" => 2));
+     */
+    public function addRegex ($regex, $map = array('ctl' => 1, 'act' => 2)) {
         $this->orders[] = array('type' => 'regex',
                 'params' => array('uri' => $regex, 'map' => $map)
         );
@@ -93,8 +113,15 @@ class Asf_Router {
                     break;
                 case 'regex':
                     if(preg_match($order['params']['uri'], $_SERVER['REQUEST_URI'], $match)) {
-                        $path['ctl'] = $match[$order['params']['map']['ctl']];
-                        $path['act'] = $match[$order['params']['map']['act']];
+                    	$ctlIndex = $order['params']['map']['ctl'];
+                    	$actIndex = $order['params']['map']['act'];
+                        $path['ctl'] = is_int($ctlIndex) ? $match[$ctlIndex] : $ctlIndex;
+                        $path['act'] = is_int($actIndex) ? $match[$actIndex] : $actIndex;
+                        foreach ($order['params']['map'] as $k => $v) {
+                            if(!in_array($k, array_keys($path))) {
+                                $_GET[$k] = $match[$v];
+                            }
+                        }
                     }
                     break;
 
